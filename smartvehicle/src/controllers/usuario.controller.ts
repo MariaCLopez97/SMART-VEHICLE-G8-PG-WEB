@@ -1,30 +1,30 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
+import {LLaves} from '../config/llaves';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
+import {AutenticacionService} from '../services';
+const fetch = require('node-fetch');
 
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
-    public usuarioRepository : UsuarioRepository,
-  ) {}
+    public usuarioRepository: UsuarioRepository,
+    @service(AutenticacionService)
+    public servicioAutenticacion: AutenticacionService
+  ) { }
 
   @post('/usuarios')
   @response(200, {
@@ -44,7 +44,21 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    return this.usuarioRepository.create(usuario);
+    const clave = this.servicioAutenticacion.generarClave();
+    const claveCifrada = this.servicioAutenticacion.cifrarClave(clave);
+    usuario.clave = claveCifrada;
+    const p = await this.usuarioRepository.create(usuario);
+
+    const destino = usuario.correo;
+    const asunto = 'Registrado en Backend Loopback.';
+    const contenido = `Hola ${usuario.nombres} , su usuario es: ${usuario.correo}, clave: ${clave}`;
+
+    fetch(`${LLaves.urlServicioNotificaciones}/correo?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
+      .then((data: unknown) => {
+        console.log(data);
+      })
+
+    return p;
   }
 
   @get('/usuarios/count')
