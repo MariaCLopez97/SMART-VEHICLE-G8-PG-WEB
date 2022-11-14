@@ -1,26 +1,33 @@
-import {authenticate} from '@loopback/authentication';
+import { authenticate } from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
+  post,
+  param,
+  get,
+  getModelSchemaRef,
+  patch,
+  put,
+  del,
+  requestBody,
+  response,
 } from '@loopback/rest';
 import {Vehiculo} from '../models';
 import {VehiculoRepository} from '../repositories';
 
-@authenticate("crud")
+@authenticate("admin")
+@authenticate("asesor")
 export class VehiculoController {
   constructor(
     @repository(VehiculoRepository)
-    public vehiculoRepository: VehiculoRepository,
-  ) { }
+    public vehiculoRepository : VehiculoRepository,
+  ) {}
 
   @post('/vehiculos')
   @response(200, {

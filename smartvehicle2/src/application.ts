@@ -13,7 +13,6 @@ import { EstrategiaAdministrador } from './strategies/admin.strategy';
 import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import { EstrategiaCliente } from './strategies/cliente.strategy';
 import { EstrategiaAsesor } from './strategies/asesor.strategy';
-import { EstrategiaCrud } from './strategies/crud.strategy';
 
 export {ApplicationConfig};
 
@@ -53,9 +52,6 @@ export class SmartvehicleApplication extends BootMixin(
     this.component(AuthenticationComponent);  
     
     registerAuthenticationStrategy(this, EstrategiaAsesor);
-    this.component(AuthenticationComponent);   
-    
-    registerAuthenticationStrategy(this, EstrategiaCrud);
-    this.component(AuthenticationComponent);     
+    this.component(AuthenticationComponent);      
   }
 }
